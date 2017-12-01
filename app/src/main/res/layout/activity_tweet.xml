@@ -5,6 +5,19 @@
     android:id="@+id/activity_tweet"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorBg"
     tools:context="com.thoughtworks.homework.ui.TweetActivity">
-
+<android.support.v4.widget.SwipeRefreshLayout
+    android:id="@+id/tweet_refresh_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <ListView
+        android:id="@+id/tweet_listview"
+        android:divider="@color/colorLine"
+        android:dividerHeight="0.5dp"
+        android:entries="@array/abc"
+        android:scrollbars="none"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</android.support.v4.widget.SwipeRefreshLayout>
 </RelativeLayout>

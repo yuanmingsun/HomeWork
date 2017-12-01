@@ -22,6 +22,7 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile rootProject.ext.dependencies["appcompat-v7"]
+    compile rootProject.ext.dependencies["volley"]
+    compile rootProject.ext.dependencies["gson"]
     testCompile 'junit:junit:4.12'
-    compile project(':mvp')
 }

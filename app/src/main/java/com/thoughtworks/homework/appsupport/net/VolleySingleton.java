@@ -1,13 +1,18 @@
-package com.thoughtworks.mvp.net;
+package com.thoughtworks.homework.appsupport.net;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.LruCache;
+import android.widget.ImageView;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
+import com.thoughtworks.homework.R;
+import com.thoughtworks.homework.appsupport.Config;
 
 /**
  * Copyright (C) 2015 - 2017 MICROSCENE Inc., All Rights Reserved.
@@ -50,8 +55,27 @@ public class VolleySingleton {
         return mRequestQueue;
     }
     public <T> void addToRequestQueue(Request<T> req){
+        req.setRetryPolicy(new DefaultRetryPolicy(Config.TIMEOUT,Config.RETRYNUM, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         getRequestQueue().add(req);
     }
+
+    public <T extends ImageView> void displayImage(final T img,final String url )
+    {
+        img.setImageResource(R.mipmap.avatar_default);
+        getImageLoader().get(url, new ImageLoader.ImageListener() {
+            @Override
+            public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+                if(url.equals(img.getTag()))
+                img.setImageBitmap(response.getBitmap());
+            }
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+               img.setImageResource(R.mipmap.avatar_default);
+            }
+        });
+    }
+
     public ImageLoader getImageLoader() {
         return mImageLoader;
     }

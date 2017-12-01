@@ -1,4 +1,4 @@
-package com.thoughtworks.mvp.mvp;
+package com.thoughtworks.homework.appsupport.mvp;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -51,6 +51,16 @@ public abstract class BaseActivity<P extends IPresenter> extends AppCompatActivi
             return (W) idViews.get(id);
         }
         View v = findViewById(id);
+        idViews.put(id, v);
+        return (W) v;
+    }
+
+
+    protected <W extends View> W $(View view,int id) {
+        if (idViews.containsKey(id)) {
+            return (W) idViews.get(id);
+        }
+        View v = view.findViewById(id);
         idViews.put(id, v);
         return (W) v;
     }
