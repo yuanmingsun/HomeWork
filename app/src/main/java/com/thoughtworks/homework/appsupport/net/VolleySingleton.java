@@ -60,7 +60,8 @@ public class VolleySingleton {
 
     public <T extends ImageView> void displayImage(final T img,String url )
     {
-       ImageLoader.ImageListener listener= getImageLoader().getImageListener(img,R.mipmap.avatar_default,R.mipmap.avatar_default);
+
+       ImageLoader.ImageListener listener= getImageLoader().getImageListener(img,R.mipmap.default_img,R.mipmap.default_img);
         getImageLoader().get(url, listener);
     }
 
