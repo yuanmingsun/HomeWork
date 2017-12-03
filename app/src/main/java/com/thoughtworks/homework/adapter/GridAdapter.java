@@ -17,7 +17,7 @@ import java.util.List;
  * Copyright (C) 2015 - 2017 MICROSCENE Inc., All Rights Reserved.
  *
  * @author: seven@vb.com.cn
- * @date: 2017-12-01
+ * @date: 2017-12-03
  */
 public class GridAdapter extends BaseAdapter {
     private Context mContext;
@@ -48,9 +48,22 @@ public class GridAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         String url=list.get(position).getUrl();
-        convertView= LayoutInflater.from(mContext).inflate(R.layout.grid_item,null);
-        ImageView gridImg=(ImageView)convertView.findViewById(R.id.grid_img);
-        VolleySingleton.getVolleySingleton(mContext).displayImage(gridImg,url);
+        ViewHolder holder;
+        if(convertView==null)
+        {
+            holder=new ViewHolder();
+            convertView= LayoutInflater.from(mContext).inflate(R.layout.grid_item,null);
+            holder.gridImg=(ImageView)convertView.findViewById(R.id.grid_img);
+            convertView.setTag(holder);
+        }
+        else{
+            holder=(ViewHolder) convertView.getTag();
+        }
+        holder.gridImg.setImageBitmap(null);
+        VolleySingleton.getVolleySingleton(mContext).displayImage(holder.gridImg,url);
         return convertView;
+    }
+    class ViewHolder{
+        ImageView gridImg;
     }
 }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:weightSum="3"
+              android:layout_height="50dp">
+   <ImageView android:id="@+id/img_item_img1"
+              style="@style/ItemImgStyle"/>
+    <ImageView android:id="@+id/img_item_img2"
+               style="@style/ItemImgStyle"/>
+    <ImageView android:id="@+id/img_item_img3"
+               style="@style/ItemImgStyle"/>
+</LinearLayout>

@@ -5,7 +5,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.VolleyError;
@@ -13,11 +12,12 @@ import com.thoughtworks.homework.R;
 import com.thoughtworks.homework.adapter.TweetListAdapter;
 import com.thoughtworks.homework.appsupport.mvp.BaseActivity;
 import com.thoughtworks.homework.appsupport.net.VolleySingleton;
-import com.thoughtworks.homework.appsupport.utils.AppToast;
 import com.thoughtworks.homework.bean.TweetBean;
 import com.thoughtworks.homework.bean.UserBean;
 import com.thoughtworks.homework.presenter.TweetPresenter;
+import com.thoughtworks.homework.view.LoadMoreListView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,10 +29,12 @@ import java.util.List;
  */
 public class TweetActivity extends BaseActivity<TweetPresenter> {
 
-    private ListView mTweetListView;
+    private LoadMoreListView mTweetListView;
     private SwipeRefreshLayout mTweetrefreshLayout;
     private View headerView;
     private TweetListAdapter mTweetListAdapter;
+    private List<TweetBean> mTweetBeanList=new ArrayList<>();
+    private int page = 0;
 
     @Override
     public void initData(Bundle savedInstanceState) {
@@ -50,18 +52,50 @@ public class TweetActivity extends BaseActivity<TweetPresenter> {
             mTweetListView.addHeaderView(headerView);
             mTweetListView.setHeaderDividersEnabled(false);
         }
-        mTweetListAdapter=new TweetListAdapter(this);
+        mTweetListAdapter = new TweetListAdapter(this);
         mTweetListView.setAdapter(mTweetListAdapter);
+        mTweetListView.setOnLoadMoreListener(mOnLoadMoreListener);
     }
-    SwipeRefreshLayout.OnRefreshListener mRefreshListener=new SwipeRefreshLayout.OnRefreshListener() {
+
+
+    private synchronized void  loadMore() {
+        int startIndex = page * 5;
+        int endIndex = page * 5 + 5;
+        if (endIndex >= mTweetBeanList.size()) {
+            mTweetListAdapter.addData(subList(mTweetBeanList,startIndex, mTweetBeanList.size()));
+            mTweetListView.setLoadCompleted();
+        } else {
+            mTweetListAdapter.addData(subList(mTweetBeanList,startIndex, endIndex));
+        }
+        page++;
+    }
+
+    public <T> List<T> subList(List<T> fromList,int startIndex,int endIndex) {
+        List<T> list = new ArrayList<>();
+        for (int i = 0; i < fromList.size(); i++)
+        {
+            if(i>=startIndex&&i<endIndex)
+            {
+                list.add(fromList.get(i));
+            }
+        }
+        return list;
+    }
+
+    LoadMoreListView.OnLoadMoreListener mOnLoadMoreListener = new LoadMoreListView.OnLoadMoreListener() {
+        @Override
+        public void onloadMore() {
+           loadMore();
+        }
+    };
+    SwipeRefreshLayout.OnRefreshListener mRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
             fetchData();
         }
     };
-    public void showError(VolleyError error)
-    {
-        AppToast.toast(this,error.toString());
+
+    public void showError(VolleyError error) {
         mTweetrefreshLayout.setRefreshing(false);
     }
 
@@ -70,10 +104,9 @@ public class TweetActivity extends BaseActivity<TweetPresenter> {
 
         TextView mHeaderNameTxt = $(headerView, R.id.header_name_txt);
         ImageView mHeaderImg = $(headerView, R.id.header_headerimg_img);
-    //    ImageView mCoverImg = $(headerView, R.id.header_cover_img);
+        //    ImageView mCoverImg = $(headerView, R.id.header_cover_img);
         VolleySingleton.getVolleySingleton(this).displayImage(mHeaderImg, user.getAvatar());
         mHeaderNameTxt.setText(user.getNick());
-      //  VolleySingleton.getVolleySingleton(this).displayImage(mCoverImg, user.getProfileimage());
     }
 
     //成功获取userinfo数据
@@ -82,10 +115,20 @@ public class TweetActivity extends BaseActivity<TweetPresenter> {
         addHeaderToList(userBean);
     }
 
-    public void showTweets(List<TweetBean> list)
-    {
-         mTweetrefreshLayout.setRefreshing(false);
-         mTweetListAdapter.notifyAll(list);
+    public void showTweets(List<TweetBean> list) {
+        page = 0;
+        mTweetBeanList = list;
+        mTweetrefreshLayout.setRefreshing(false);
+        //  mTweetListView.setLoading(true);
+        if (5 >= list.size()) {
+
+            mTweetListAdapter.notifyAll(subList(mTweetBeanList,0, list.size()));
+            mTweetListView.setLoadCompleted();
+        } else {
+            mTweetListAdapter.notifyAll(subList(mTweetBeanList,0, 5));
+        }
+
+        page++;
     }
 
 

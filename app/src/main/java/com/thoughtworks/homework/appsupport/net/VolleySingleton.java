@@ -8,7 +8,6 @@ import android.widget.ImageView;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.thoughtworks.homework.R;
@@ -59,21 +58,10 @@ public class VolleySingleton {
         getRequestQueue().add(req);
     }
 
-    public <T extends ImageView> void displayImage(final T img,final String url )
+    public <T extends ImageView> void displayImage(final T img,String url )
     {
-        img.setImageResource(R.mipmap.avatar_default);
-        getImageLoader().get(url, new ImageLoader.ImageListener() {
-            @Override
-            public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-                if(url.equals(img.getTag()))
-                img.setImageBitmap(response.getBitmap());
-            }
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-               img.setImageResource(R.mipmap.avatar_default);
-            }
-        });
+       ImageLoader.ImageListener listener= getImageLoader().getImageListener(img,R.mipmap.avatar_default,R.mipmap.avatar_default);
+        getImageLoader().get(url, listener);
     }
 
     public ImageLoader getImageLoader() {

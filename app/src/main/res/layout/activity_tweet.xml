@@ -11,7 +11,7 @@
     android:id="@+id/tweet_refresh_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-    <ListView
+    <com.thoughtworks.homework.view.LoadMoreListView
         android:id="@+id/tweet_listview"
         android:divider="@color/colorLine"
         android:dividerHeight="0.5dp"

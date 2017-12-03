@@ -5,13 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.thoughtworks.homework.R;
 import com.thoughtworks.homework.appsupport.net.VolleySingleton;
 import com.thoughtworks.homework.bean.TweetBean;
+import com.thoughtworks.homework.view.NineGridView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,20 +28,23 @@ public class TweetListAdapter extends BaseAdapter {
     private Context mContext;
     private List<TweetBean> list;
 
-    public TweetListAdapter(Context context,List<TweetBean> list)
-    {
-        this.mContext=context;
+    public TweetListAdapter(Context context, List<TweetBean> list) {
+        this.mContext = context;
         notifyAll(list);
     }
-    public TweetListAdapter(Context context)
-    {
-        this.mContext=context;
-        list=new ArrayList<>();
+
+    public TweetListAdapter(Context context) {
+        this.mContext = context;
+        list = new ArrayList<>();
     }
 
-    public void notifyAll(List<TweetBean> list)
+    public void notifyAll(List<TweetBean> list) {
+        this.list = list;
+        notifyDataSetChanged();
+    }
+    public void addData(List<TweetBean> list)
     {
-        this.list=list;
+        this.list.addAll(list);
         notifyDataSetChanged();
     }
 
@@ -63,56 +67,74 @@ public class TweetListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        TweetBean tweetBean=list.get(position);
-        if(convertView==null)
-        {
-            holder=new ViewHolder();
-            convertView= LayoutInflater.from(mContext).inflate(R.layout.tweet_item,null);
-            holder.headerImgView=(ImageView) convertView.findViewById(R.id.item_header_img);
-            holder.nameTextView=(TextView)convertView.findViewById(R.id.item_name_text);
-            holder.contentTextView=(TextView)convertView.findViewById(R.id.item_content_text);
-            holder.mGridView=(GridView)convertView.findViewById(R.id.item_img_grid);
+        TweetBean tweetBean = list.get(position);
+        if (convertView == null) {
+            holder = new ViewHolder();
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.tweet_item, null);
+            holder.headerImgView = (ImageView) convertView.findViewById(R.id.item_header_img);
+            holder.nameTextView = (TextView) convertView.findViewById(R.id.item_name_text);
+            holder.contentTextView = (TextView) convertView.findViewById(R.id.item_content_text);
+            holder.mNineGridView=(NineGridView) convertView.findViewById(R.id.item_img_grid);
+            holder.discussLayout=(LinearLayout)convertView.findViewById(R.id.item_discuss_layout);
             convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
         }
-        else
-        {
-            holder=(ViewHolder) convertView.getTag();
-        }
-        TweetBean.SenderBean senderBean=tweetBean.getSender();
-        if(senderBean!=null)
-        {
+        TweetBean.SenderBean senderBean = tweetBean.getSender();
+        holder.headerImgView.setImageBitmap(null);
+        if (senderBean != null) {
             VolleySingleton.getVolleySingleton(mContext).displayImage(holder.headerImgView,senderBean.getAvatar());
-            holder.headerImgView.setTag(senderBean.getAvatar());
             holder.nameTextView.setText(senderBean.getNick());
-        }
-        else{
-            holder.headerImgView.setImageResource(R.mipmap.avatar_default);
+        } else {
             holder.nameTextView.setText("");
         }
-        if(tweetBean.getContent()!=null)
-        {
+        if (tweetBean.getContent() != null) {
             holder.contentTextView.setText(tweetBean.getContent());
-        }
-        else{
+        } else {
             holder.contentTextView.setText("");
         }
-       if(tweetBean.getImages()!=null&&tweetBean.getImages().size()>0){
-        holder.mGridView.setVisibility(View.VISIBLE);
-        holder.mGridView.setAdapter(new GridAdapter(mContext,tweetBean.getImages()));}
+        if(tweetBean.getImages()!=null&&tweetBean.getImages().size()>0){
+            holder.mNineGridView.setVisibility(View.VISIBLE);
+            holder.mNineGridView.setAdapter(new GridAdapter(mContext,tweetBean.getImages()));}
         else
-       {
-           holder.mGridView.setVisibility(View.GONE);
-       }
+        {
+            holder.mNineGridView.setVisibility(View.GONE);
+        }
+        holder.discussLayout.removeAllViews();
+        if(tweetBean.getComments()!=null&&tweetBean.getComments().size()>0)
+        {
+            for(TweetBean.CommentsBean comment :tweetBean.getComments())
+            {
+                holder.discussLayout.addView(createDiscussView(comment));
+            }
+        }
+        else
+        {
+            holder.discussLayout.removeAllViews();
+        }
+
 
         return convertView;
     }
 
+    private View createDiscussView(TweetBean.CommentsBean comment)
+    {
+       View discussView= LayoutInflater.from(mContext).inflate(R.layout.discuss_item,null);
+        TextView discussName=(TextView)discussView.findViewById(R.id.discuss_name_textview);
+        TextView discussContent=(TextView)discussView.findViewById(R.id.discuss_content_textview);
+        discussName.setText(comment.getSender().getNick()+":");
+        discussContent.setText(comment.getContent());
+        return discussView;
+    }
 
 
-    class ViewHolder{
+
+
+    class ViewHolder {
         ImageView headerImgView;
-        TextView  nameTextView;
+        TextView nameTextView;
         TextView contentTextView;
-        GridView mGridView;
+        NineGridView mNineGridView;
+        LinearLayout discussLayout;
     }
 }

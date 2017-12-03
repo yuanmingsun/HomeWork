@@ -28,14 +28,23 @@
          </LinearLayout>
 
      </LinearLayout>
-    <GridView
+    <com.thoughtworks.homework.view.NineGridView
         android:id="@+id/item_img_grid"
         android:layout_marginLeft="80dp"
         android:layout_marginTop="10dp"
         android:numColumns="3"
-        android:stretchMode="none"
         android:gravity="center"
-        android:horizontalSpacing="5dp"
+        android:scrollbars="none"
+        android:verticalSpacing="10dp"
+        android:horizontalSpacing="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:id="@+id/item_discuss_layout"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_marginLeft="80dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/colorDiscussBg"
+        android:layout_height="wrap_content"></LinearLayout>
 </LinearLayout>
